@@ -3,12 +3,15 @@ require 'rails_helper'
 RSpec.describe OperationsController, type: :controller do
 
   before(:all) do
-    @employee ||= Faker::Name.name
+    @first_employee ||= Faker::Name.name
+    @second_employee ||= Faker::Name.name
     10.times.each do
-      Operation.create(employee: @employee, operation: 'Marcar Chegada')
-      Operation.create(employee: @employee, operation: 'Marcar Saída')
+      Operation.create(employee: @first_employee, operation: 'Marcar Chegada')
+      Operation.create(employee: @first_employee, operation: 'Marcar Saída')
+      Operation.create(employee: @second_employee, operation: 'Freelancer')
     end
   end
+
   describe "GET #index" do
     it "returns http success" do
       get :index
@@ -16,24 +19,31 @@ RSpec.describe OperationsController, type: :controller do
     end
 
     it "returns all operations" do
-      get :index
-      expect(assigns(:operations)).should have_exactly(20).items
+      get :index, params: {employee: @first_employee}
+      assigns(:operations).should have(20).items
+    end
+  end
+
+  describe "POST #create" do
+    context 'Success' do
+      it "returns http success" do
+        post :create, params: {operation: {employee: Faker::Name.name, operation: 'Marcar Chegada'}}
+        expect(response).to have_http_status(:success)
+      end
+      
+      it "returns operations and now actual" do
+        post :create, params: {operation: {employee: Faker::Name.name, operation: 'Marcar Chegada'}}
+        assigns(:operations).should have(1).items
+      end
+    end
+
+    context 'Failure' do
+      it "fail when try create" do
+        post :create
+        expect(response).to have_http_status(:error)
+      end
     end
     
-  end
-
-  describe "GET #show" do
-    it "returns http success" do
-      get :show
-      expect(response).to have_http_status(:success)
-    end
-  end
-
-  describe "GET #create" do
-    it "returns http success" do
-      get :create
-      expect(response).to have_http_status(:success)
-    end
   end
 
 end

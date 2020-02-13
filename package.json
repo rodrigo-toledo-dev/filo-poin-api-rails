@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "husky": "^4.2.3"
+  },
+  "husky": {
+    "pre-commit": "echo"
+  },
+  "lint-staged": {
+    "app/*.rb":[
+      "bundle exec guard"
+    ]
+  }
+}
